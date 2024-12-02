@@ -3,7 +3,7 @@
     "dotenv": "^16.4.5"
   },
   "scripts": {
-    "start": "node server.js",
+    "start": "node backend/server.js",
     "dev": "nodemon server.js",
     "build": "cd frontend && npm install && npm run build",
     "heroku-postbuild": "npm run build"
