@@ -36,6 +36,16 @@ const employeeRoutes = require('./routes/employeeRoutes');
 app.use('/api/users', userRoutes);
 app.use('/api/employees', employeeRoutes);
 
+// Root endpoint for API testing
+app.get('/', (req, res) => {
+    res.send('API is running...');
+});
+
+// Handle 404 errors for unmatched routes
+app.use((req, res, next) => {
+    res.status(404).json({ error: 'Route not found' });
+});
+
 // Start server
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

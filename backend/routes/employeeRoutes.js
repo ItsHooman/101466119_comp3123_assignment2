@@ -2,14 +2,19 @@ const express = require('express');
 const router = express.Router();
 const Employee = require('../models/employee');
 
-// Add a new employee
-router.post('/', async (req, res) => {
+// Search employees by department or position
+router.get('/search', async (req, res) => {
+    const { department, position } = req.query;
+
+    const query = {};
+    if (department) query.department = department;
+    if (position) query.position = position;
+
     try {
-        const newEmployee = new Employee(req.body);
-        await newEmployee.save();
-        res.status(201).json(newEmployee);
+        const employees = await Employee.find(query);
+        res.status(200).json(employees);
     } catch (error) {
-        res.status(400).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch employees' });
     }
 });
 
@@ -23,14 +28,27 @@ router.get('/', async (req, res) => {
     }
 });
 
-// Get an employee by ID
+// Get a specific employee by ID
 router.get('/:id', async (req, res) => {
     try {
         const employee = await Employee.findById(req.params.id);
-        if (!employee) return res.status(404).json({ error: 'Employee not found' });
+        if (!employee) {
+            return res.status(404).json({ error: 'Employee not found' });
+        }
         res.status(200).json(employee);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(500).json({ error: 'Failed to fetch employee' });
+    }
+});
+
+// Add a new employee
+router.post('/', async (req, res) => {
+    try {
+        const newEmployee = new Employee(req.body);
+        await newEmployee.save();
+        res.status(201).json(newEmployee);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
     }
 });
 
@@ -53,22 +71,5 @@ router.delete('/:id', async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 });
-
-// backend/routes/employeeRoutes.js
-router.get('/search', async (req, res) => {
-    try {
-        const { department, position } = req.query;
-        const query = {};
-
-        if (department) query.department = department;
-        if (position) query.position = position;
-
-        const employees = await Employee.find(query);
-        res.status(200).json(employees);
-    } catch (error) {
-        res.status(500).json({ error: error.message });
-    }
-});
-
 
 module.exports = router;
